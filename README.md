@@ -8,6 +8,7 @@ Este projeto é uma aplicação em JavaScript desenvolvida para identificar chuv
 - **Lógica de Intervalos**: Compara a data de hoje com os períodos de início e fim de diversas chuvas de meteoros.
 - **Suporte a Virada de Ano**: O algoritmo trata corretamente chuvas que começam em um ano e terminam no outro (ex: de Dezembro a Janeiro).
 - **Feedback Visual**: Retorna uma mensagem no console listando os nomes das chuvas ativas ou informando que não há atividade hoje.
+- **Listagem Próximas Chuvas**: Exibe as chuvas que acontecerão nos próximos 2 meses.
 
 ## 🚀 Como executar
 
@@ -18,7 +19,7 @@ Certifique-se de ter o [Node.js](https://nodejs.org/) instalado em sua máquina.
 3. Execute o script de lógica:
 
 ```bash
-node funcoes/funcoesLogicas.js
+node index.js
 ```
 
 ## 📂 Estrutura de Arquivos
