@@ -1,38 +1,122 @@
-import chuvaDeMeteoros from "../data/chuva-de-meteoros.js";
+/**
+ * @description Verifica se a chuva recebida por parâmetro está visível baseado
+ * na data recebida. Retorna true ou false
+ *
+ * @param {Object} chuva
+ * @param {Date} dataAtual
+ * @returns {boolean}
+ */
+export const verificaChuvaVisivelPorData = (chuva, dataAtual) => {
+    const anoAtual = dataAtual.getFullYear();
 
-let data = new Date();
+    const dataInicio = new Date(chuva.inicio + '/' + anoAtual);
+    const dataFim = new Date(chuva.fim + '/' + anoAtual);
 
-// Sugestão ajustada: função para apresentar chuvas ativas hoje (considerando intervalos e cruzamentos de ano), retornando uma mensagem com os nomes das chuvas específicas
-function retornaChuvaDeHoje(chuvaDeMeteoros, data) {
-    const anoAtual = data.getFullYear();
-    const mesAtual = data.getMonth();  // 0-based
-    const diaAtual = data.getDate();
+    dataFim.setHours(23, 59, 59, 999);
 
-    let chuvasHoje = chuvaDeMeteoros.filter(chuva => {
-        const [mesInicio, diaInicio] = chuva.inicio.split('/').map(Number);
-        const [mesFim, diaFim] = chuva.fim.split('/').map(Number);
+    let chuvaDentroDaData = false;
 
-        // Cria objetos Date para comparação (usando ano atual)
-        const dataInicio = new Date(anoAtual, mesInicio - 1, diaInicio);
-        const dataFim = new Date(anoAtual, mesFim - 1, diaFim);
-        const dataAtual = new Date(anoAtual, mesAtual, diaAtual);
+    if (dataInicio > dataFim) {
 
-        // Ajusta para chuvas que cruzam o ano (ex.: dezembro a janeiro)
-        if (dataInicio > dataFim) {
-            // Chuva cruza o ano: verifica se dataAtual >= dataInicio OU <= dataFim
-            return dataAtual >= dataInicio || dataAtual <= dataFim;
-        } else {
-            // Chuva dentro do mesmo ano: verifica se dataAtual >= dataInicio E <= dataFim
-            return dataAtual >= dataInicio && dataAtual <= dataFim;
+        dataInicio.setFullYear(anoAtual - 1);
+
+        if(dataAtual >= dataInicio && dataAtual <= dataFim)
+        {
+            chuvaDentroDaData = true;
         }
-    });
+        else
+        {
+            dataInicio.setFullYear(dataAtual.getFullYear());
+            dataFim.setFullYear(anoAtual +1);
 
-    if (chuvasHoje.length > 0) {
-        const nomes = chuvasHoje.map(chuva => chuva.nome).join(', ');
-        return `Chuvas ativas hoje (${data.toLocaleDateString('pt-BR')}): ${nomes}`;
-    } else {
-        return `Sem chuva para o dia de hoje (${data.toLocaleDateString('pt-BR')})`;
+            chuvaDentroDaData = (dataAtual >= dataInicio && dataAtual <= dataFim);
+        }
     }
+    else
+    {
+        chuvaDentroDaData = (dataAtual >= dataInicio && dataAtual <= dataFim);
+    }
+
+    return (chuvaDentroDaData);
 }
 
-console.log(retornaChuvaDeHoje(chuvaDeMeteoros, data));
+/**
+ * @description Verifica se a chuva recebida por parâmetro estará visível nos
+ * próximos 2 meses baseado na data recebida
+ *
+ * @param {object} chuva
+ * @param {Date} data
+ * @returns {boolean}
+ */
+export const verificaChuvaVisivelProximos2Meses = (chuva, data) => {
+    const dataAtual = data;
+    const anoAtual = dataAtual.getFullYear();
+
+    const dataInicio = new Date(chuva.inicio + '/' + anoAtual);
+    const dataFim = new Date(chuva.fim + '/' + anoAtual);
+
+    const dataLimite = new Date(dataAtual);
+    dataLimite.setMonth(dataLimite.getMonth() + 2);
+
+    dataFim.setHours(23, 59, 59, 999);
+
+    let chuvaDentroDaData = false;
+
+    if (dataFim < dataAtual && dataInicio < dataAtual){
+        dataInicio.setFullYear(anoAtual + 1);
+        dataFim.setFullYear(anoAtual + 1);
+    }
+
+    if (dataInicio > dataFim) {
+        dataInicio.setFullYear(anoAtual - 1);
+
+        if(dataAtual < dataInicio || dataAtual > dataFim)
+        {
+            dataInicio.setFullYear(dataAtual.getFullYear());
+            dataFim.setFullYear(anoAtual +1);
+        }
+    }
+
+    if (dataFim > dataAtual && dataInicio > dataAtual && dataInicio <= dataLimite) {
+        chuvaDentroDaData = true;
+    }
+
+    return (chuvaDentroDaData);
+}
+
+/**
+ * @description Inverte o mes e o dia de uma data que não possui ano definido
+ *
+ * @param {String} data
+ */
+export const inverteMesAno = (data) => {
+    const dataInvertida = data.split('/');
+
+    return dataInvertida[1] + '/' + dataInvertida[0];
+}
+
+/**
+ * @description Retorna um texto com a intensidade da chuva
+ *
+ * @param {String} intensidade
+ */
+export const retornaIntensidade = (intensidade) => {
+    let novaIntensidade = '1 (Fraca)';
+
+    if ( intensidade.indexOf('Forte') >= 0 ) {
+        novaIntensidade = '3 (Forte)';
+    } else if ( intensidade.indexOf('Média') >= 0 ) {
+        novaIntensidade = '2 (Média)';
+    } else if (  intensidade.indexOf('Irregular') >= 0 ) {
+        novaIntensidade = '(Irregular)';
+    }
+
+    return novaIntensidade;
+}
+
+/**
+ * @description Retorna o hemisfério baseado no valor da declinação
+ *
+ * @param {Number} declinacao
+ */
+export const retornaHemisferio = (declinacao) => declinacao >= 0 ? 'Norte' : 'Sul';

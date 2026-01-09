@@ -1,36 +1,34 @@
-import chuvaDeMeteoros from './data/chuva-de-meteoros.js';
-import verificaChuvaVisivelHoje from './funcoes/hoje.js';
-import verificaChuvaVisivelProximos2Meses from './funcoes/doisMeses.js';
-import defineDados from './funcoes/formataDados.js';
+import colecaoChuvasDeMeteoros from "./data/chuva-de-meteoros.js";
+import imprimeListaDeChuvas from "./funcoes/interface.js";
+import {
+    verificaChuvaVisivelPorData,
+    verificaChuvaVisivelProximos2Meses
+} from "./funcoes/funcoesLogicas.js";
 
 const dataAtual = new Date();
 
-const chuvasHoje = chuvaDeMeteoros.filter((chuva) => verificaChuvaVisivelHoje(chuva, dataAtual));
+const chuvasVisiveisHoje = colecaoChuvasDeMeteoros.filter(
+    (chuva)=> verificaChuvaVisivelPorData(chuva, dataAtual)
+);
 
-const chuvasHojeFormatada = chuvasHoje.map((chuva) => defineDados(chuva));
+const chuvasVisiveisProximos2Meses = colecaoChuvasDeMeteoros.filter(
+    (chuva)=> verificaChuvaVisivelProximos2Meses(chuva, dataAtual)
+);
 
-const chuvasProximas = chuvaDeMeteoros.filter((chuva) => verificaChuvaVisivelProximos2Meses(chuva, dataAtual));
+console.log('Chuva de meteoros');
 
-const chuvaProximaFormatada = chuvasProximas.map((chuva) => defineDados(chuva));
+if ( chuvasVisiveisHoje.length > 0 ) {
+    let msg = "\nEncontramos ";
+    msg += chuvasVisiveisHoje.length == 1
+        ? '1 chuva de meteoros que pode ser vista hoje'
+        : chuvasVisiveisHoje.length + ' chuvas de meteoros que podem ser vistas hoje';
 
-console.log('\n----------CHUVA DE METEOROS----------');
+    console.log(msg);
 
-if (chuvasHoje.length > 0) {
-    console.log('CHUVAS QUE PODEM SER VISTAS HOJE');
-
-    console.log(chuvasHoje);
+    imprimeListaDeChuvas(chuvasVisiveisHoje);
 } else {
-    console.log('\n---------Não há chuvas hoje!---------\n');
+    console.log('\nNenhuma chuva de meteoros passando no momento');
 }
 
-console.log(`ENCONTRADAS ${chuvasProximas.length} CHUVAS QUE PODERÃO SER VISTAS NOS PRÓXIMOS 2 MESES\n`);
-
-chuvasHojeFormatada.forEach(chuva => 
-    console.log(chuva)
-);
-
-chuvaProximaFormatada.forEach(chuva => 
-    console.log(chuva)
-);
-
-console.log(`\n----------Fim da aplicação!----------`)
+console.log('\n\nNão perca as próximas chuvas de meteoros:');
+imprimeListaDeChuvas(chuvasVisiveisProximos2Meses);
